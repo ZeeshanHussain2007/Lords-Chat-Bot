@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Query Support</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('download.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-header img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #2a2a2a;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .user-message {
+            background: #007BFF;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background: #444;
+            align-self: flex-start;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: #1e1e1e;
+            border-top: 1px solid #333;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: #333;
+            color: white;
+        }
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            border: none;
+            background: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background: #0056b3;
+        }
+        .mic-button {
+            background: red;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .mic-button.listening {
+            background: green;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.7); padding: 15px; width: 100%; text-align: center; font-size: 24px; font-weight: bold; color: white;">
+        <img src="images.jpeg" alt="Logo" style="height: 40px; margin-right: 10px;"> 
+        Welcome to Lords Institute of Engineering and Technology Student Query Support
+    </h2>
+    <div class="chat-container">
+        <div class="chat-header">
+            Lords Chat Bot
+        </div>
+        <div class="chat-box" id="chat-history"></div>
+        <div class="chat-input">
+            <input type="text" id="question" placeholder="Ask a question..." onkeypress="handleKeyPress(event)">
+            <button onclick="getAnswer()">Submit</button>
+            <button class="mic-button" id="mic-btn" onclick="startListening()">🎤</button>
+        </div>
+    </div>
+
+    <script>
+        let chatHistory = [];
+        let speech = new SpeechSynthesisUtterance();
+        let recognition;
+        let isListening = false;
+
+        async function getAnswer() {
+    let questionInput = document.getElementById("question");
+    let question = questionInput.value.trim().toLowerCase();
+
+    if (!question) return;
+
+    chatHistory.push({ type: "user", text: question });
+    updateChatHistory(document.getElementById("chat-history"));
+
+    let fetchedAnswer = "";
+    
+    if (question.includes("what event is going on in lords lords institute of engineering and technology first year campus")) {
+        fetchedAnswer = "The Talent Hunt event";
+      }
+      else if (question.includes("who is your creator") ||
+        question.includes("who is your founder") || 
+        question.includes("who is your owner") || 
+        question.includes("who is your inventor")) {
+        fetchedAnswer = "Zeeshan Hussain";
+    } 
+      else if (question.includes("which event is going on in this week")) {
+        fetchedAnswer = "The Talent Hunt event";
+      }
+      else if (question.includes("who is the dean of first year")) {
+        fetchedAnswer = "Dr Sasi Kiran Jangala";
+      }
+      else if (question.includes("who is the principal of lords institute of engineering and technology")) {
+        fetchedAnswer = "Ravi Kishore Singh.";
+      }
+      else if (question.includes("who is the chairman of lords institute of engineering and technology"))  {
+        fetchedAnswer = "Basha Mohiuddin.";
+      }
+      else if (question.includes("tell me about lords institute of engineering and technology"))  {
+        fetchedAnswer = "The college is recognized by Telangana State Council of Higher Education (TSCHE), Government of Telangana; Approved by All India Council for Technical Education (AICTE); Affiliated to Osmania University; Accredited by National Board of Accreditation (NBA), National Assessment and Accreditation Council (NAAC) with 'A' Grade, National Accreditation Board for Testing and Calibration Laboratories (NABL); Conferred as Autonomous by University Grants Commission (UGC) from 2021 to 2032 and impanelled in UGC 2F. LIET hosts the Telangana Chapter of the International Network for Outcome Based Education IN4OBE which is the first in India.[3].";
+      }
+      else if (question.includes("when was liet established"))  {
+        fetchedAnswer = "LIET was established in 2002.";
+      }  
+      else if (question.includes("what affiliations and accreditations does liet have"))  {
+        fetchedAnswer = "LIET is affiliated with Osmania University and is approved by the All India Council for Technical Education (AICTE). It has been accredited with an 'A' grade by the National Assessment and Accreditation Council (NAAC) and has received accreditation from the National Board of Accreditation (NBA) for its BE programs in Computer Science and Engineering, Electronics and Communication Engineering, and Mechanical Engineering.";
+      }
+      else if (question.includes("who is the vice chairman of lords institute of engineering and technology"))  {
+        fetchedAnswer = "Syed Tausif Ahmed.";
+      }
+      else if (question.includes("what programs does lords institute of engineering and technology offer"))  {
+        fetchedAnswer = "LIET offers undergraduate programs in Bachelor of Engineering (BE) across various specializations and postgraduate programs including Master of Business Administration (MBA) and Master of Technology (M.Tech).";
+      }
+      else if (question.includes("What are the eligibility criteria for BE programs"))  {
+        fetchedAnswer = "Admission to the BE programs is based on the Telangana State Engineering, Agriculture, and Medical Common Entrance Test (TS EAMCET) scores.";
+      }
+   else if (question.includes("tell me about your founder") || 
+        question.includes("tell me about your inventor")) {
+        fetchedAnswer = "Zeeshan Hussain, a student of BE first year from AIML-B at Lords Institute of Engineering and Technology.";
+    } 
+   else if (question.includes("where is lords institute of engineering and technology located"))  {
+        fetchedAnswer = "Lords Institute of Engineering and Technology (LIET) is a self-financing Muslim Minority Autonomous Engineering College near Appa Junction, Himayath Sagar, Ranga Reddy district, Telangana, India.";   
+      }
+   else if (question.includes("about lords institute of Engineering and Technology"))  {
+        fetchedAnswer = "Lords Institute of Engineering and Technology is one of the top engineering colleges in Hyderabad, offering courses in AI, ML, CSE, ECE, and more.";    
+      }
+    else {
+        try {
+            let prompt = `Answer the following question concisely in 5-6 lines: ${question}`;
+
+            // If user specifies a word limit, adjust the prompt
+            let match = question.match(/in (\d+) words|in (\d+) lines/);
+            if (match) {
+                let specifiedLimit = match[1] || match[2];
+                prompt = `Answer in ${specifiedLimit} words: ${question}`;
+            }
+
+            let response = await fetch("http://localhost:4000/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: prompt })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            let data = await response.json();
+            fetchedAnswer = data.answer?.trim() || "I couldn't find a relevant answer. Please try again.";
+
+        } catch (error) {
+            console.error("API Fetch Error:", error);
+            fetchedAnswer = "Error fetching answer. Please try again later.";
+        }
+    }
+
+    chatHistory.push({ type: "bot", text: fetchedAnswer });
+    updateChatHistory(document.getElementById("chat-history"));
+
+    speakText(fetchedAnswer);
+
+    questionInput.value = "";
+    questionInput.focus();
+}
+
+
+        function updateChatHistory(box) {
+            box.innerHTML = chatHistory.map(entry => 
+                `<div class="chat-message ${entry.type === 'user' ? 'user-message' : 'bot-message'}">${entry.text}</div>`
+            ).join("");
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                getAnswer();
+            }
+        }
+
+        function startListening() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+
+            if (!recognition) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = "en-US";
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    document.getElementById("mic-btn").classList.add("listening");
+                    document.getElementById("mic-btn").innerText = "🎙 Listening...";
+                };
+
+                recognition.onresult = function(event) {
+                    let transcript = event.results[0][0].transcript;
+                    document.getElementById("question").value = transcript;
+                    getAnswer();
+                };
+
+                recognition.onerror = function(event) {
+                    console.error("Speech recognition error:", event.error);
+                    document.getElementById("mic-btn").innerText = "🎤";
+                    document.getElementById("mic-btn").classList.remove("listening");
+                };
+
+                recognition.onend = function() {
+                    isListening = false;
+                    document.getElementById("mic-btn").innerText = "🎤";
+                    document.getElementById("mic-btn").classList.remove("listening");
+                };
+            }
+
+            if (!isListening) {
+                recognition.start();
+            } else {
+                recognition.stop();
+            }
+        }
+
+        function speakText(text) {
+    speechSynthesis.cancel(); // Stop any ongoing speech
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.rate = 1;
+    speech.volume = 1;
+    speech.pitch = 1;
+    speechSynthesis.speak(speech);0
+}
+
+    </script>
+</body>
+</html>
